@@ -117,6 +117,39 @@
   }
 }
 
+/* Thinking messages */
+.thinking-messages {
+  display: none;
+  padding: 1rem;
+  border-radius: 0.66em;
+  background: var(--color-bg-subtle);
+  margin-block-end: 1rem;
+
+  .sidebar & {
+    @media (min-width: 100ch) {
+      margin-inline-start: 2vw;
+    }
+  }
+
+  &.thinking-messages--active {
+    display: block;
+  }
+
+  .message--thinking {
+    opacity: 0.8;
+  }
+
+  .message__body-content--thinking {
+    animation: thinking-pulse 2s infinite;
+  }
+}
+
+@keyframes thinking-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
 /* Typing indicator */
 .typing-indicator {
   inset-block-start: var(--indicator-position, 0.15rem);
@@ -130,6 +163,10 @@
     @media (min-width: 100ch) {
       margin-inline-start: 2vw;
     }
+  }
+
+  &.thinking-messages--active ~ & {
+    --indicator-position: 4rem;
   }
 
   &.typing-indicator--active {

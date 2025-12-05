@@ -2,11 +2,24 @@ class Messages::ByBotsController < MessagesController
   allow_bot_access only: :create
 
   def create
+    set_room
+    clear_thinking_messages
     super
     head :created, location: message_url(@message)
   end
 
   private
+    def set_room
+      @room = Room.find(params[:room_id])
+    end
+
+    def clear_thinking_messages
+      ActionCable.server.broadcast(
+        "typing_notifications_#{@room.id}",
+        { action: "stop_thinking", user: Current.user.slice(:id, :name) }
+      )
+    end
+
     def message_params
       if params[:attachment]
         params.permit(:attachment)
