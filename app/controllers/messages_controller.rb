@@ -19,8 +19,12 @@ class MessagesController < ApplicationController
 
   def create
     set_room
+    bot_animation = message_params.delete(:bot_response_animation)
     @message = @room.messages.create_with_attachment!(message_params)
 
+    # Store bot response animation flag as a temporary attribute
+    @message.define_singleton_method(:bot_response_animation) { bot_animation } if bot_animation
+    
     @message.broadcast_create
     deliver_webhooks_to_bots
   rescue ActiveRecord::RecordNotFound
@@ -68,7 +72,7 @@ class MessagesController < ApplicationController
 
 
     def message_params
-      params.require(:message).permit(:body, :attachment, :client_message_id)
+      params.require(:message).permit(:body, :attachment, :client_message_id, :bot_response_animation)
     end
 
 

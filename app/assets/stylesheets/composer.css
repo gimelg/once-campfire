@@ -120,16 +120,6 @@
 /* Thinking messages */
 .thinking-messages {
   display: none;
-  padding: 1rem;
-  border-radius: 0.66em;
-  background: var(--color-bg-subtle);
-  margin-block-end: 1rem;
-
-  .sidebar & {
-    @media (min-width: 100ch) {
-      margin-inline-start: 2vw;
-    }
-  }
 
   &.thinking-messages--active {
     display: block;
@@ -137,18 +127,236 @@
 
   .message--thinking {
     opacity: 0.8;
-  }
-
-  .message__body-content--thinking {
-    animation: thinking-pulse 2s infinite;
+    font-style: italic;
+    
+    .avatar__initials {
+      font-size: 0.8em;
+    }
   }
 }
+
+/* Global thinking message animation - applies anywhere thinking messages appear */
+.message--thinking {
+  position: relative;
+}
+
+/* Replace avatar with animated dots */
+.message--thinking .message__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5ch;
+  height: 3.5ch;
+}
+
+/* Hide the actual avatar content */
+.message--thinking .message__avatar .avatar {
+  display: none;
+}
+
+/* Create animated dots in place of avatar */
+.message--thinking .message__avatar::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background-color: var(--color-text, #333);
+  border-radius: 50%;
+  animation: thinking-avatar-dots 1.2s ease-in-out infinite;
+  box-shadow: 
+    -8px 0 0 0 var(--color-text, #333),
+    8px 0 0 0 var(--color-text, #333);
+}
+
+@media (prefers-color-scheme: dark) {
+  .message--thinking .message__avatar {
+    background-color: var(--color-message-bg, rgba(255, 255, 255, 0.1));
+    border-radius: 50%;
+  }
+  
+  .message--thinking .message__avatar::after {
+    background-color: var(--color-text-reversed, #fff);
+    box-shadow: 
+      -8px 0 0 0 var(--color-text-reversed, #fff),
+      8px 0 0 0 var(--color-text-reversed, #fff);
+  }
+}
+
+/* Text opacity wave effect */
+.message--thinking .thinking-content {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Create horizontal wave overlay */
+.message--thinking .thinking-content::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
+  animation: thinking-text-wave 2.2s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-color-scheme: dark) {
+  .message--thinking .thinking-content::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+  }
+}
+
+
+
+
+/* Thinking message animations */
+.thinking-avatar {
+  animation: thinking-avatar-pulse 1.5s ease-in-out infinite;
+}
+
+.thinking-timestamp {
+  animation: thinking-text-fade 2s ease-in-out infinite;
+}
+
+.thinking-content {
+  position: relative;
+  opacity: 0.9;
+}
+
+@keyframes thinking-text-wave {
+  0% { 
+    transform: translateX(-100%);
+  }
+  20% { 
+    transform: translateX(-40%);
+  }
+  35% { 
+    transform: translateX(50%);
+  }
+  50% { 
+    transform: translateX(150%);
+  }
+  65% { 
+    transform: translateX(250%);
+  }
+  80% { 
+    transform: translateX(333%);
+  }
+  100% { 
+    transform: translateX(333%);
+  }
+}
+
+@keyframes thinking-avatar-dots {
+  0% { 
+    opacity: 1;
+    box-shadow: 
+      -8px 0 0 0 rgba(51, 51, 51, 0.4),
+      8px 0 0 0 rgba(51, 51, 51, 0.4);
+  }
+  33% { 
+    opacity: 0.3;
+    box-shadow: 
+      -8px 0 0 0 var(--color-text, #333),
+      8px 0 0 0 rgba(51, 51, 51, 0.4);
+  }
+  66% { 
+    opacity: 0.3;
+    box-shadow: 
+      -8px 0 0 0 rgba(51, 51, 51, 0.4),
+      8px 0 0 0 var(--color-text, #333);
+  }
+  100% { 
+    opacity: 1;
+    box-shadow: 
+      -8px 0 0 0 rgba(51, 51, 51, 0.4),
+      8px 0 0 0 rgba(51, 51, 51, 0.4);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @keyframes thinking-avatar-dots {
+    0% { 
+      opacity: 1;
+      box-shadow: 
+        -8px 0 0 0 rgba(255, 255, 255, 0.4),
+        8px 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    33% { 
+      opacity: 0.3;
+      box-shadow: 
+        -8px 0 0 0 var(--color-text-reversed, #fff),
+        8px 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    66% { 
+      opacity: 0.3;
+      box-shadow: 
+        -8px 0 0 0 rgba(255, 255, 255, 0.4),
+        8px 0 0 0 var(--color-text-reversed, #fff);
+    }
+    100% { 
+      opacity: 1;
+      box-shadow: 
+        -8px 0 0 0 rgba(255, 255, 255, 0.4),
+        8px 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
 
 @keyframes thinking-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
+  0% { opacity: 0.6; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.6; }
 }
+
+@keyframes thinking-avatar-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes thinking-text-fade {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Bot response typing animation */
+.bot-response-content {
+  overflow: hidden;
+  /* Duration will be set dynamically by JavaScript based on message length */
+  animation-name: bot-response-typing;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes bot-response-typing {
+  0% { 
+    max-height: 1.5em;
+    width: 0;
+  }
+  10% {
+    max-height: 1.5em;
+    width: 100%;
+  }
+  100% {
+    max-height: var(--target-height);
+    width: 100%;
+  }
+}
+
 
 /* Typing indicator */
 .typing-indicator {

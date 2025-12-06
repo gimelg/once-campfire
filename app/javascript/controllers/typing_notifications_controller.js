@@ -7,7 +7,7 @@ import ThinkingTracker from "models/thinking_tracker"
 import { createThinkingMessageElement } from "lib/thinking_message_renderer"
 
 export default class extends Controller {
-  static targets = [ "author", "indicator", "thinkingContainer" ]
+  static targets = [ "author", "indicator" ]
   static classes = [ "active" ]
 
   async connect() {
@@ -17,7 +17,9 @@ export default class extends Controller {
 
       this.channel = await cable.subscribeTo(
         { channel: "TypingNotificationsChannel", room_id: Current.room.id },
-        { received: this.#received.bind(this) }
+        { 
+          received: this.#received.bind(this)
+        }
       )
     }
   }
@@ -46,7 +48,7 @@ export default class extends Controller {
       } else if (action === "stop") {
         this.tracker.remove(user.name)
       } else if (action === "thinking") {
-        this.thinkingTracker.set(user.name, message)
+        this.thinkingTracker.set(user, message)
       } else if (action === "stop_thinking") {
         this.thinkingTracker.clear()
       }
@@ -63,17 +65,63 @@ export default class extends Controller {
   }
 
   #updateThinking(thinkingMessage) {
-    if (thinkingMessage) {
-      // Clear existing thinking message and show new one
-      this.thinkingContainerTarget.innerHTML = ""
-      
-      const messageEl = createThinkingMessageElement(thinkingMessage.name, thinkingMessage.message)
-      this.thinkingContainerTarget.appendChild(messageEl)
-      
-      this.thinkingContainerTarget.classList.add("thinking-messages--active")
-    } else {
-      this.thinkingContainerTarget.classList.remove("thinking-messages--active")
+    // Complete any ongoing bot typewriter animations before showing thinking message
+    this.#completeOngoingTypewriterEffects()
+    
+    // Find the messages container in the page
+    let messagesContainer = document.querySelector('.messages')
+    if (!messagesContainer) {
+      messagesContainer = document.querySelector(`#room_${Current.room.id}_messages`)
     }
+    if (!messagesContainer) {
+      messagesContainer = document.querySelector(`[data-messages-target="messages"]`)
+    }
+    if (!messagesContainer) {
+      return
+    }
+
+    // Remove any existing thinking message
+    const existingThinking = messagesContainer.querySelector('.thinking-message-container')
+    if (existingThinking) {
+      existingThinking.remove()
+    }
+
+    if (thinkingMessage) {
+      // Create and append new thinking message
+      const thinkingContainer = document.createElement('div')
+      thinkingContainer.className = 'thinking-message-container'
+      
+      const messageEl = createThinkingMessageElement(thinkingMessage)
+      
+      thinkingContainer.appendChild(messageEl)
+      messagesContainer.appendChild(thinkingContainer)
+      
+      // Auto-scroll to show the thinking message
+      this.#scrollToThinkingMessage(thinkingContainer)
+    }
+  }
+
+  #completeOngoingTypewriterEffects() {
+    // Find the messages controller and complete any active typewriters
+    const messagesController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller*="messages"]'),
+      "messages"
+    )
+    
+    if (messagesController) {
+      messagesController.completeOngoingBotAnimations()
+    }
+  }
+
+  #scrollToThinkingMessage(element) {
+    // Scroll the thinking message into view
+    setTimeout(() => {
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'end',
+        inline: 'nearest'
+      })
+    }, 100) // Small delay to ensure DOM is updated
   }
 
   #throttledSend = throttle(action => this.#send(action))

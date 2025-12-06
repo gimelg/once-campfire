@@ -63,6 +63,7 @@ Rails.application.routes.draw do
     resources :messages
 
     post ":bot_key/messages", to: "messages/by_bots#create", as: :bot_messages
+    post ":bot_key/animated_messages", to: "messages/animated_by_bots#create", as: :bot_animated_messages
     post ":bot_key/thinking", to: "messages/thinking#create", as: :bot_thinking
 
     scope module: "rooms" do

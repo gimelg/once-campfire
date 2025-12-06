@@ -1,3 +1,6 @@
-<div id="<%= dom_id(message, :presentation) %>" dir="auto" data-reply-target="body" data-messages-target="body">
-  <%= message_presentation(message) %>
+<div id="<%= dom_id(message, :presentation) %>" dir="auto" data-reply-target="body" data-messages-target="body" 
+     <%= 'data-bot-response-animation="true"' if message.respond_to?(:bot_response_animation) && message.bot_response_animation %>>
+  <div class="<%= 'bot-response-content' if message.respond_to?(:bot_response_animation) && message.bot_response_animation %>">
+    <%= message_presentation(message) %>
+  </div>
 </div>

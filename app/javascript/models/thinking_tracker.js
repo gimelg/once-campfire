@@ -4,8 +4,8 @@ export default class ThinkingTracker {
     this.store = null
   }
 
-  set(name, message) {
-    this.store = { name, message, timestamp: Date.now() }
+  set(user, message) {
+    this.store = { user, message, timestamp: Date.now() }
     this.#refresh()
   }
 

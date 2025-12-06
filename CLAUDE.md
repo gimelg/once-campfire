@@ -25,3 +25,13 @@ bin/rails test:system
 ```
 
 Note: Use `bin/rails` (not `rails`) as this project uses bundler-managed Rails.
+
+## Ruby Version Management
+
+This project uses Ruby 3.4.5. To set up the correct Ruby version:
+
+```bash
+# Install and set Ruby version with rbenv
+rbenv global 3.4.5
+source ~/.zshrc
+```

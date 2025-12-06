@@ -14,15 +14,13 @@ class Messages::ByBotsController < MessagesController
     end
 
     def clear_thinking_messages
-      ActionCable.server.broadcast(
-        "typing_notifications_#{@room.id}",
-        { action: "stop_thinking", user: Current.user.slice(:id, :name) }
-      )
+      message_data = { action: "stop_thinking", user: Current.user.slice(:id, :name) }
+      TypingNotificationsChannel.broadcast_to(@room, message_data)
     end
 
     def message_params
       if params[:attachment]
-        params.permit(:attachment)
+        params.permit(:attachment, :bot_response_animation)
       else
         reading(request.body) { |body| { body: body } }
       end
